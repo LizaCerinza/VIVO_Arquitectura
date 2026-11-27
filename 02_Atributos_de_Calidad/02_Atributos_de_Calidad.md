@@ -46,18 +46,25 @@ Aplican a todos los componentes del sistema, no a uno solo.
 
 ## 2.2 Los cinco atributos más importantes
 
-| # | Atributo | Por qué es de los más importantes |
-|---|---|---|
-| 1 | **Disponibilidad** | Es la promesa principal del servicio (24/7). El mayor riesgo es depender de terceros que VIVO no controla, y eso obliga a separar la recepción del trámite. |
-| 2 | **Interoperabilidad** | Todo el valor de VIVO depende de comunicarse bien con varios proveedores. Cada uno necesita su propio punto de integración, aislado del resto del sistema. |
-| 3 | **Seguridad** | Un acceso cruzado entre empresas expondría datos personales y permitiría tramitar a nombre de otra empresa: es un riesgo legal y de confianza. |
-| 4 | **Trazabilidad** | El manifiesto es un documento legal. VIVO debe poder demostrar qué pasó con cada solicitud, sobre todo cuando la respuesta del RNDC es incierta. |
-| 5 | **Configurabilidad** | VIVO es un puente entre los operadores y el RNDC, y las reglas del RNDC cambian. Las validaciones, los parámetros de integración y los mensajes deben poder ajustarse sin desplegar código nuevo. |
+Estos cinco atributos son los **drivers de arquitectura** que guían el diseño ADD (Punto 5). Los escogimos porque cumplen a la vez cuatro condiciones:
 
-Los demás atributos no se descartan, sino que quedan cubiertos por estos cinco o se tratan como transversales:
+- **Evidencia:** salen de una meta, un requisito o una restricción del Punto 1.
+- **Impacto estructural:** si se ignoran, la arquitectura sería distinta.
+- **Costo del fallo:** su incumplimiento es grave para el negocio.
+- **Incertidumbre:** dependen de algo que VIVO no controla.
 
-- La **integridad de los datos** y la **usabilidad**, como la seguridad, son transversales: se exigen en todos los componentes y en todos los escenarios.
+| # | Atributo | Por qué es de los más importantes | Qué obliga a diseñar |
+|---|---|---|---|
+| 1 | **Disponibilidad** | Es la promesa principal del servicio (24/7, MN-01). Depende del RNDC, que ha tenido intermitencias y contingencias oficiales en 2026 [F3, F4]. | Separar la recepción del trámite, cola durable, estado pendiente y corte de llamadas ante fallas. |
+| 2 | **Integridad de los datos** | El error más costoso de VIVO no es la caída sino perder o duplicar una solicitud, o reportar «emitido» sin confirmación (MN-04, RF-04, RF-06). Es un riesgo legal. | Identificador interno estable, idempotencia, guardar y publicar sin pérdida, máquina de estados y conciliación antes de reintentar. |
+| 3 | **Seguridad** | Varias empresas comparten el sistema y se manejan datos personales (MN-03, RT-03, Ley 1581). El número de WhatsApp no prueba por sí solo la identidad (RF-01). | Asociación usuario-empresa, autorización en cada operación, aislamiento de datos por empresa y auditoría. |
+| 4 | **Interoperabilidad** | VIVO es un puente: su valor depende de integrarse bien con dos proveedores con contratos distintos, el RNDC y WhatsApp (RT-01, RT-02). | Un adaptador aislado por proveedor, traducción de contratos y clasificación de respuestas. |
+| 5 | **Trazabilidad** | El manifiesto es un documento legal: VIVO debe poder demostrar qué pasó con cada solicitud (RF-09, RF-10). También es la base para conciliar respuestas inciertas del RNDC. | Historial inmutable de estados e intentos, correlacionado por el identificador interno. |
+
+Los demás atributos no se descartan, sino que quedan cubiertos por estos cinco:
+
+- La **configurabilidad** y la **mantenibilidad** se apoyan en el aislamiento de las integraciones (Interoperabilidad). Además, no hay evidencia de qué tan seguido cambia el RNDC como para que sean un driver propio.
+- El **desempeño** se logra con la misma separación entre recepción y trámite que exige Disponibilidad. El volumen esperado es bajo (unas 1.500 solicitudes al día).
 - La **observabilidad** y la **recuperabilidad** apoyan a Disponibilidad y Trazabilidad.
-- La **mantenibilidad** se logra al aislar las integraciones (Interoperabilidad) y sacar las reglas del código (Configurabilidad).
+- La **usabilidad** se resuelve en el diseño de la conversación por WhatsApp, no en la estructura.
 - La **testabilidad** es la condición para comprobar las medidas de los escenarios del Punto 3.
-- El **desempeño** se atiende con la misma separación entre recepción y trámite que exige Disponibilidad.
