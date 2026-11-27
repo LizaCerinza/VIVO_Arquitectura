@@ -4,6 +4,10 @@
 
 El diagrama de contexto muestra a VIVO como una caja negra: quién lo usa y con qué sistemas externos se comunica. VIVO es un **puente** entre el operador (por WhatsApp) y el RNDC. No controla a ninguno de los dos sistemas externos.
 
+![C4 · Nivel 1 · Contexto de VIVO](imagenes/C1_Contexto.svg)
+
+*Imagen exportada desde Structurizr a partir de [workspace.dsl](workspace.dsl). Si se cambia el DSL, hay que volver a exportarla.*
+
 ## Elementos
 
 | Elemento | Tipo | Descripción |

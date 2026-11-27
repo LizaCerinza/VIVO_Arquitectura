@@ -4,6 +4,10 @@
 
 Este diagrama abre la caja de VIVO y muestra sus contenedores: cada aplicación o almacén de datos que se despliega por separado. Es el resultado de las cinco iteraciones de ADD ([5.2](../5.2_Iteraciones_ADD.md)).
 
+![C4 · Nivel 2 · Contenedores de VIVO](imagenes/C2_Contenedores.svg)
+
+*Imagen exportada desde Structurizr a partir de [workspace.dsl](workspace.dsl). Si se cambia el DSL, hay que volver a exportarla.*
+
 ## Contenedores
 
 | Contenedor | Tecnología (familia) | Responsabilidad | Iteración ADD |
