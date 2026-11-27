@@ -1,0 +1,1 @@
+# Spec · Recepción de solicitud

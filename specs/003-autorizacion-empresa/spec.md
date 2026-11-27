@@ -1,0 +1,1 @@
+# Spec · Autorización por empresa
