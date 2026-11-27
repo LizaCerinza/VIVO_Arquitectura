@@ -11,7 +11,7 @@ Pontificia Universidad Javeriana Cali · Maestría en Ingeniería de Software ·
 
 ## Cómo leer este proyecto
 
-Cada punto de la tarea está en su propia carpeta numerada. Al abrir la carpeta, GitHub muestra su contenido (`README.md`).
+Cada punto está en su propia carpeta numerada. Al abrir la carpeta, GitHub muestra su contenido (`README.md`).
 
 | Punto | Sección de la tarea | Carpeta | Estado |
 |---|---|---|---|
