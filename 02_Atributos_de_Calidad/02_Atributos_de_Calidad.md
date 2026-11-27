@@ -1,80 +1,64 @@
 # 2. Identificación de Atributos de Calidad
 
-## 2.1 Método
+Identificamos los atributos de calidad a partir del contexto del problema (Punto 1):
 
-Seguimos el enfoque visto en clase (*Características de Arquitectura*, Richards & Ford): las características se descubren de tres fuentes:
+- **Explícitos:** aparecen en las metas, los requisitos o las restricciones.
+- **Implícitos:** no están escritos, pero se deducen del dominio (trámite legal, datos personales, dependencia de terceros).
 
-1. **Preocupaciones del dominio:** las metas del negocio (MN).
-2. **Requisitos:** los requerimientos funcionales (RF), las restricciones (RT) y las métricas (sección 1.9).
-3. **Conocimiento implícito del dominio:** lo que nadie escribe pero se sabe del contexto (dependencia del RNDC, datos personales, trámite legal).
+Los agrupamos con la clasificación vista en clase: operacionales, estructurales y transversales.
 
-Un atributo es **explícito** si aparece en el enunciado o en los requisitos. Es **implícito** si lo deducimos del dominio. Para que sea una característica de arquitectura debe cumplir los tres criterios de clase:
+## 2.1 Atributos identificados
 
-- (a) Es una consideración de diseño independiente del dominio.
-- (b) Influye en la estructura.
-- (c) Es crítica para el éxito.
+### Operacionales
 
-## 2.2 Relación entre la descripción del problema y los atributos de calidad
+Cómo se comporta el sistema mientras funciona.
 
-| # | Fragmento del problema (sección 1) | Ref. | Atributo de calidad | Tipo |
-|---|---|---|---|---|
-| 1 | «Recibir solicitudes **24/7** por WhatsApp, aun con fallas del RNDC» | MN-01, SP-01 | Disponibilidad | Explícito |
-| 2 | «El RNDC ha tenido episodios de **lentitud e intermitencia**; se activó un plan de contingencia» | 1.1, [F3, F4] | Disponibilidad / tolerancia a fallas | Implícito |
-| 3 | «Las operaciones pendientes deben **retomarse** tras una interrupción» | RF-07 | Recuperabilidad | Implícito |
-| 4 | «**Ráfagas de 50 eventos** simultáneos en la hora pico; p95 ≤ 3 s para registrar» | 1.9 | Desempeño | Explícito |
-| 5 | «Reducir el **tiempo** que el operador dedica al trámite» | MN-02 | Desempeño / usabilidad | Explícito |
-| 6 | «Verificar su autorización para **actuar por una empresa**» | RF-01, MN-03 | Seguridad (autenticación y autorización) | Explícito |
-| 7 | «Datos personales de conductores y propietarios: **Ley 1581 de 2012**» | RT-03 | Seguridad / privacidad / legalidad | Explícito |
-| 8 | «El número de WhatsApp **no demuestra** que el remitente pueda actuar por la empresa» | ADR-004 | Seguridad | Implícito |
-| 9 | «Integración **exclusivamente por el mecanismo autorizado** del RNDC» | RF-05, RT-01 | Interoperabilidad | Explícito |
-| 10 | «Mensajes y notificaciones por **WhatsApp Business Platform**» | RT-02, RF-08 | Interoperabilidad | Explícito |
-| 11 | «Adaptarse a **cambios normativos o técnicos** del RNDC sin rehacer el sistema» | MN-05 | Modificabilidad | Explícito |
-| 12 | «**Nunca** reportar emitido sin confirmación; **sin duplicar** registros» | MN-04, RF-06 | Integridad / confiabilidad | Explícito |
-| 13 | «Conservar **historial** de estados, intentos y responsables» | RF-09 | Auditabilidad / trazabilidad | Explícito |
-| 14 | «Revisar casos que exigen **atención manual**; antigüedad de pendientes» | RF-10, 1.9 | Observabilidad / soportabilidad | Implícito |
-| 15 | «Canal **familiar** para el operador; captura conversacional de datos» | 1.1, RF-02 | Usabilidad | Explícito |
-| 16 | «60 empresas el primer año, **posible crecimiento**» | 1.4, SP-03 | Escalabilidad | Implícito |
-| 17 | «Equipo **pequeño** (2–4 desarrolladores), operable sin plataforma compleja» | RT-05 | Simplicidad / factibilidad (costo) | Explícito |
-| 18 | «Ajustes frecuentes de reglas y validaciones del RNDC deben **llegar rápido a producción**» | MN-05 | Desplegabilidad | Implícito |
+| Atributo | Tipo | Por qué aparece en VIVO | Ref. |
+|---|---|---|---|
+| Disponibilidad | Explícito | El servicio debe recibir solicitudes **24/7**, aun si el RNDC o WhatsApp fallan. | MN-01 |
+| Desempeño | Explícito | Hay ráfagas de solicitudes en la madrugada, y la recepción no debe esperar al RNDC. | MN-02, 1.9 |
+| Recuperabilidad | Implícito | Las solicitudes pendientes deben retomarse después de una falla. | RF-07 |
+| Observabilidad | Implícito | El equipo debe ver en tiempo real la salud del sistema (logs, métricas y alertas): si el RNDC falla, cuántas solicitudes están pendientes y cuánto llevan esperando. | RF-07, RF-10 |
 
-## 2.3 Priorización de mayor a menor importancia
+### Estructurales
 
-Para ordenar usamos el criterio del **árbol de utilidad** (Bass, Clements & Kazman). Cada atributo se califica en dos ejes, Alto (A), Medio (M) o Bajo (B):
+Cómo está construido el sistema y qué tan fácil es cambiarlo.
 
-- **Importancia para el negocio:** qué tanto afecta el éxito si falla.
-- **Impacto en la arquitectura:** qué tanto obliga a cambiar la estructura.
+| Atributo | Tipo | Por qué aparece en VIVO | Ref. |
+|---|---|---|---|
+| Interoperabilidad | Explícito | VIVO se conecta con **varios proveedores externos**: WhatsApp Business Platform (mensajería) y RNDC (servicio web oficial), cada uno con su propio contrato, formato y reglas. | RF-05, RF-08, RT-01, RT-02 |
+| Configurabilidad | Explícito | VIVO debe **adaptarse a cambios** sin desplegar código nuevo. Se configuran las reglas de validación del manifiesto, las empresas y usuarios autorizados, los parámetros de integración (tiempos límite, reintentos, umbrales) y los textos de los mensajes. | MN-05 |
+| Mantenibilidad | Implícito | Un equipo pequeño debe poder corregir y evolucionar el sistema. Los cambios del RNDC no deben propagarse a todo el código. | MN-05, RT-05 |
+| Testabilidad | Implícito | Se debe poder probar el sistema sin depender del RNDC ni de WhatsApp reales (simuladores, pruebas de contrato), y verificar las medidas de los escenarios: 0 pérdidas y 0 accesos cruzados. | RT-01, 1.9 |
 
-Los pares (A,A) van primero. Luego se aplica el consejo de clase: mantener la lista corta y no diseñar para todo (el anti-patrón del *Vasa*).
+### Transversales
 
-| Prioridad | Atributo | Negocio | Arquitectura | ¿Cumple a, b, c? | Justificación | Decisión |
-|---|---|---|---|---|---|---|
-| **1** | **Disponibilidad** | A | A | Sí | El riesgo principal es la caída de un tercero (RNDC) que VIVO no controla. Si la recepción depende de él, el servicio 24/7 no existe. | **Top 5** · EC-01 |
-| **2** | **Seguridad** | A | A | Sí | Un acceso cruzado entre empresas expone datos personales y permite tramitar a nombre de otro. Es un riesgo legal (Ley 1581). | **Top 5** · EC-03 |
-| **3** | **Desempeño** | A | A | Sí | Las ráfagas de la madrugada y la lentitud del RNDC obligan a separar la recepción del procesamiento. | **Top 5** · EC-02 |
-| **4** | **Interoperabilidad** | A | M | Sí | Dos dependencias externas con contratos propios (RNDC y WhatsApp) que exigen adaptadores dedicados. | **Top 5** |
-| **5** | **Modificabilidad** | M | A | Sí | Las reglas y servicios del RNDC cambian. Aislar la integración evita que el cambio se propague. | **Top 5** |
-| 6 | Integridad / confiabilidad | A | A | Sí | No perder ni duplicar solicitudes ni reportar estados falsos. | **Transversal:** se exige como medida en EC-01 y en ADR-002 y ADR-005. |
-| 7 | Recuperabilidad | M | M | Sí | Retomar pendientes tras una falla. | Cubierto por Disponibilidad (cola durable, reintento). |
-| 8 | Auditabilidad / trazabilidad | A | B | Parcial | Historial de estados e intentos. | Cubierto por Seguridad (táctica *Auditoría*). |
-| 9 | Observabilidad / soportabilidad | M | M | Sí | Ver circuito abierto, pendientes y conciliaciones. | Soporte de EC-01 (monitor de salud). |
-| 10 | Simplicidad / factibilidad | M | M | Sí | Equipo pequeño. | Restricción que justifica monolito modular (ADR-001). |
-| 11 | Usabilidad | A | B | No (b) | Flujo conversacional claro. | Se resuelve en el diseño de la conversación, no en la estructura. |
-| 12 | Escalabilidad | M | B | No (c) | Unas 1.500 solicitudes al día es un volumen bajo. | Se revisa si el volumen crece. |
-| 13 | Desplegabilidad | B | M | No (c) | Cambios del adaptador frecuentes pero acotados. | Pipeline CI/CD estándar. |
+Aplican a todos los componentes del sistema, no a uno solo.
 
-> **Trade-offs reconocidos («la arquitectura menos mala»):**
-> - Más seguridad (autorización en cada operación, cifrado) añade latencia a la recepción, lo que tensiona el desempeño.
-> - Más disponibilidad (cola, reintentos) añade complejidad y consistencia eventual, lo que tensiona la simplicidad.
-> - Proteger la integridad (conciliar antes de reintentar) puede alargar el tiempo de emisión, lo que tensiona el desempeño percibido.
+| Atributo | Tipo | Por qué aparece en VIVO | Ref. |
+|---|---|---|---|
+| Seguridad | Explícito | Cada operador solo puede ver y tramitar solicitudes de su empresa, y se manejan datos personales (Ley 1581 de 2012). Aplica en la recepción, la consulta, la integración y el almacenamiento. | RF-01, MN-03, RT-03 |
+| Integridad de los datos | Explícito | No perder ni duplicar solicitudes, y nunca reportar «emitido» sin confirmación del RNDC. Cada componente que lee o cambia un estado debe respetarlo. | MN-04, RF-06 |
+| Trazabilidad | Explícito | Cada solicitud debe poder seguirse de principio a fin: quién la hizo, qué estados tuvo, qué intentos se hicieron y qué respondió el RNDC. | RF-09, MN-04 |
+| Archivabilidad | Implícito | Las solicitudes, el historial de estados y la auditoría deben **conservarse** durante el tiempo que exija la normativa. Después se archivan en almacenamiento secundario o se eliminan, sobre todo los datos personales. | RF-09, RT-03, SP-03 |
+| Usabilidad | Explícito | El operador usa un canal familiar (WhatsApp) con un flujo de captura sencillo y mensajes claros del estado real. | MN-02, RF-02 |
 
-## 2.4 Los cinco atributos seleccionados
+> **Trazabilidad vs. observabilidad:** la trazabilidad es de negocio: registra qué le pasó a cada solicitud y sirve como evidencia. La observabilidad es técnica: muestra la salud del sistema en ejecución para detectar y diagnosticar fallas.
 
-| # | Atributo | Pregunta que debe responder la arquitectura |
+## 2.2 Los cinco atributos más importantes
+
+| # | Atributo | Por qué es de los más importantes |
 |---|---|---|
-| 1 | Disponibilidad | ¿Sigue VIVO recibiendo y conservando solicitudes cuando el RNDC falla? |
-| 2 | Seguridad | ¿Puede un usuario ver o tramitar algo de una empresa que no le corresponde? |
-| 3 | Desempeño | ¿Se registra una solicitud en ≤ 3 s (p95) durante una ráfaga de 50 eventos? |
-| 4 | Interoperabilidad | ¿Se intercambia información con RNDC y WhatsApp solo por contratos autorizados y aislados? |
-| 5 | Modificabilidad | ¿Un cambio del RNDC se resuelve tocando un solo componente? |
+| 1 | **Disponibilidad** | Es la promesa principal del servicio (24/7). El mayor riesgo es depender de terceros que VIVO no controla, y eso obliga a separar la recepción del trámite. |
+| 2 | **Interoperabilidad** | Todo el valor de VIVO depende de comunicarse bien con varios proveedores. Cada uno necesita su propio punto de integración, aislado del resto del sistema. |
+| 3 | **Seguridad** | Un acceso cruzado entre empresas expondría datos personales y permitiría tramitar a nombre de otra empresa: es un riesgo legal y de confianza. |
+| 4 | **Trazabilidad** | El manifiesto es un documento legal. VIVO debe poder demostrar qué pasó con cada solicitud, sobre todo cuando la respuesta del RNDC es incierta. |
+| 5 | **Archivabilidad** | Los datos del trámite deben conservarse por obligación legal, pero no pueden crecer sin control ni guardar datos personales más tiempo del permitido. Esto define cómo se almacenan, se archivan y se eliminan. |
 
-Para el Punto 3 se escogen **Disponibilidad, Desempeño y Seguridad**: los tres con calificación (A,A) y con mayor efecto en la estructura.
+Los demás atributos no se descartan, sino que quedan cubiertos por estos cinco o se tratan como transversales:
+
+- La **integridad de los datos** y la **usabilidad**, como la seguridad, son transversales: se exigen en todos los componentes y en todos los escenarios.
+- La **observabilidad** y la **recuperabilidad** apoyan a Disponibilidad y Trazabilidad.
+- La **configurabilidad** y la **mantenibilidad** se logran al aislar las integraciones y sacar las reglas del código, que es lo que pide Interoperabilidad.
+- La **testabilidad** es la condición para comprobar las medidas de los escenarios del Punto 3.
+- El **desempeño** se atiende con la misma separación entre recepción y trámite que exige Disponibilidad.
