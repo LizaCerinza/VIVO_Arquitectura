@@ -40,7 +40,6 @@ Aplican a todos los componentes del sistema, no a uno solo.
 | Seguridad | Explícito | Cada operador solo puede ver y tramitar solicitudes de su empresa, y se manejan datos personales (Ley 1581 de 2012). Aplica en la recepción, la consulta, la integración y el almacenamiento. | RF-01, MN-03, RT-03 |
 | Integridad de los datos | Explícito | No perder ni duplicar solicitudes, y nunca reportar «emitido» sin confirmación del RNDC. Cada componente que lee o cambia un estado debe respetarlo. | MN-04, RF-06 |
 | Trazabilidad | Explícito | Cada solicitud debe poder seguirse de principio a fin: quién la hizo, qué estados tuvo, qué intentos se hicieron y qué respondió el RNDC. | RF-09, MN-04 |
-| Archivabilidad | Implícito | Las solicitudes, el historial de estados y la auditoría deben **conservarse** durante el tiempo que exija la normativa. Después se archivan en almacenamiento secundario o se eliminan, sobre todo los datos personales. | RF-09, RT-03, SP-03 |
 | Usabilidad | Explícito | El operador usa un canal familiar (WhatsApp) con un flujo de captura sencillo y mensajes claros del estado real. | MN-02, RF-02 |
 
 > **Trazabilidad vs. observabilidad:** la trazabilidad es de negocio: registra qué le pasó a cada solicitud y sirve como evidencia. La observabilidad es técnica: muestra la salud del sistema en ejecución para detectar y diagnosticar fallas.
@@ -53,12 +52,12 @@ Aplican a todos los componentes del sistema, no a uno solo.
 | 2 | **Interoperabilidad** | Todo el valor de VIVO depende de comunicarse bien con varios proveedores. Cada uno necesita su propio punto de integración, aislado del resto del sistema. |
 | 3 | **Seguridad** | Un acceso cruzado entre empresas expondría datos personales y permitiría tramitar a nombre de otra empresa: es un riesgo legal y de confianza. |
 | 4 | **Trazabilidad** | El manifiesto es un documento legal. VIVO debe poder demostrar qué pasó con cada solicitud, sobre todo cuando la respuesta del RNDC es incierta. |
-| 5 | **Archivabilidad** | Los datos del trámite deben conservarse por obligación legal, pero no pueden crecer sin control ni guardar datos personales más tiempo del permitido. Esto define cómo se almacenan, se archivan y se eliminan. |
+| 5 | **Configurabilidad** | VIVO es un puente entre los operadores y el RNDC, y las reglas del RNDC cambian. Las validaciones, los parámetros de integración y los mensajes deben poder ajustarse sin desplegar código nuevo. |
 
 Los demás atributos no se descartan, sino que quedan cubiertos por estos cinco o se tratan como transversales:
 
 - La **integridad de los datos** y la **usabilidad**, como la seguridad, son transversales: se exigen en todos los componentes y en todos los escenarios.
 - La **observabilidad** y la **recuperabilidad** apoyan a Disponibilidad y Trazabilidad.
-- La **configurabilidad** y la **mantenibilidad** se logran al aislar las integraciones y sacar las reglas del código, que es lo que pide Interoperabilidad.
+- La **mantenibilidad** se logra al aislar las integraciones (Interoperabilidad) y sacar las reglas del código (Configurabilidad).
 - La **testabilidad** es la condición para comprobar las medidas de los escenarios del Punto 3.
 - El **desempeño** se atiende con la misma separación entre recepción y trámite que exige Disponibilidad.
